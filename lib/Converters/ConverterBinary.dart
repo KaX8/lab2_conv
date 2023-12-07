@@ -47,12 +47,11 @@ class _ConverterBinaryState extends State<ConverterBinary> {
       if (s.isNotEmpty && currTitle == 1) {
 
         if(!RegExp("[2-9]").hasMatch(s)){
-
           result = int.parse(s, radix: 2).toString();
-
         }else {
           result = "Вы ввели что то неверно...";
         }
+
       }if (s.isNotEmpty && currTitle == 0) {
         int num = int.parse(s);
         result = num.toRadixString(2);
@@ -99,7 +98,7 @@ class _ConverterBinaryState extends State<ConverterBinary> {
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-                      inputFormatters: <TextInputFormatter>[
+                      inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly // С таким фильтром могут быть введены только числа
                       ],
                     ),

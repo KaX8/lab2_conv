@@ -17,16 +17,17 @@ class ConverterInch extends StatefulWidget{
 class _ConverterInchState extends State<ConverterInch> {
 
   final TextEditingController controller = TextEditingController();
-  List<String> titles = ["Метр в дюйм", "Дюйм в метр"];
+  List<String> titles = ["Метр", "Дюйм"];
   int currTitle = 0;
   String result = "";
+
+  List<String> items = ['Метр', 'Километр', 'Сантиметр', 'Дюйм'];
+  String selectedItem = 'Дюйм';
 
   @override
   void initState() {
     super.initState();
     controller.addListener(() {
-
-
       updateResult(controller.text);
     });
   }
@@ -46,15 +47,53 @@ class _ConverterInchState extends State<ConverterInch> {
 
   void updateResult(String s){
     setState(() {
+
       if (s.isEmpty){
         result = "Здесь будет результат...";
       }else {
         if (currTitle == 1){
-          result = "${(double.parse(s) * 0.254).round()} метров...";
+          // Дюймы во что то, считаем метр для удобства
+          double meter = (double.parse(s) * 0.254);
+          switch (selectedItem){
+            case "Метр":
+              result = "${meter} метров...";
+              break;
+            case "Сантиметр":
+              result = "${(meter * 100)} Сантиметров...";
+              break;
+            case "Километр":
+              result = "${(meter / 1000)} Километров...";
+              break;
+            case "Дюйм":
+              result = "${s} Дюймов...";
+              break;
+          }
         }else {
-          result = "${(double.parse(s) * 39.3701).round()} дюймов...";
+          // Метры во что то
+          switch (selectedItem){
+            case "Метр":
+              result = "${double.parse(s)} метров...";
+              break;
+            case "Сантиметр":
+              result = "${(double.parse(s) * 100)} Сантиметров...";
+              break;
+            case "Километр":
+              result = "${(double.parse(s) / 1000)} Километров...";
+              break;
+            case "Дюйм":
+              result = "${(double.parse(s) * 39.3701)} дюймов...";
+              break;
+          }
         }
       }
+
+      switch (currTitle){
+        case 0:
+          break;
+        case 1:
+          break;
+      }
+
     });
   }
 
@@ -64,8 +103,10 @@ class _ConverterInchState extends State<ConverterInch> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
+
     return Base.createBase(
         GestureDetector(
           onDoubleTap: (){
@@ -84,6 +125,22 @@ class _ConverterInchState extends State<ConverterInch> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    DropdownButton(
+                      value: selectedItem,
+                      onChanged: (String? newValue) {
+
+                        setState(() {
+                          selectedItem = newValue!;
+                        });
+                        updateResult(controller.text);
+                      },
+                      items: items.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                     TextFormField(
                       controller: controller,
                       autofocus: true,
@@ -112,7 +169,7 @@ class _ConverterInchState extends State<ConverterInch> {
               )
           ),
         ),
-        title: titles[currTitle]
+        title: "${titles[currTitle]} в $selectedItem"
     );
   }
 }
