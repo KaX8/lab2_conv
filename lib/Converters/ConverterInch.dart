@@ -87,13 +87,6 @@ class _ConverterInchState extends State<ConverterInch> {
         }
       }
 
-      switch (currTitle){
-        case 0:
-          break;
-        case 1:
-          break;
-      }
-
     });
   }
 

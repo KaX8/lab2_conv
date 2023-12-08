@@ -17,9 +17,12 @@ class ConverterGb extends StatefulWidget{
 class _ConverterGbState extends State<ConverterGb> {
 
   final TextEditingController controller = TextEditingController();
-  List<String> titles = ["Гиги в байты...", "Байты в гиги..."];
+  List<String> titles = ["Гиги", "Байты"];
   int currTitle = 0;
   String result = "";
+
+  List<String> items = ['Гиги', 'Байты', 'Мегабайты', 'Терабайты'];
+  String selectedItem = 'Байты';
 
   @override
   void initState() {
@@ -50,26 +53,43 @@ class _ConverterGbState extends State<ConverterGb> {
         result = "Здесь будет результат...";
       }else {
         if (currTitle == 1){
-          double num = ((double.parse(s) / 1073741824));
-          if (num < 0.0001){
-            result = "Очень мало гигов...";
-          }else {
-            num = (num * 10000).round() / 10000;
-            result = "$num гигабайт...";
+          double num = double.parse(s);
+
+          switch (selectedItem){
+            case "Гиги":
+              result = "${num / 1000000000} ГБ...";
+              break;
+            case "Байты":
+              result = "$num Байтов...";
+              break;
+            case "Мегабайты":
+              result = "${num / 1000000} Мегабайтов...";
+              break;
+            case "Терабайты":
+              result = "${num / 1000000000000} ТБ...";
+              break;
           }
+
         }else {
-          result = (int.parse(s) * 1073741824).round().toString();
-          result = "$result байт...";
+
+          switch (selectedItem){
+            case "Гиги":
+              result = "$s ГБ...";
+              break;
+            case "Байты":
+              result = "${(int.parse(s) * 1000000000).round()} Байтов...";
+              break;
+            case "Мегабайты":
+              result = "${(int.parse(s) * 1000000).round()} Мегабайтов...";
+              break;
+            case "Терабайты":
+              result = "${(int.parse(s) / 1000)} ТБ...";
+              break;
+          }
         }
       }
     });
   }
-
-  String beautifyText(String text){
-
-    return text;
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +111,22 @@ class _ConverterGbState extends State<ConverterGb> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    DropdownButton(
+                      value: selectedItem,
+                      onChanged: (String? newValue) {
+
+                        setState(() {
+                          selectedItem = newValue!;
+                        });
+                        updateResult(controller.text);
+                      },
+                      items: items.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                     TextFormField(
                       controller: controller,
                       autofocus: true,
@@ -119,7 +155,7 @@ class _ConverterGbState extends State<ConverterGb> {
               )
           ),
         ),
-        title: titles[currTitle]
+        title: "${titles[currTitle]} в $selectedItem"
     );
   }
 }

@@ -15,9 +15,12 @@ class ConverterBinary extends StatefulWidget{
 class _ConverterBinaryState extends State<ConverterBinary> {
 
   final TextEditingController controller = TextEditingController();
-  List<String> titles = ["Десятичное в двоичное", "Двоичное в десятичное"];
+  List<String> titles = ["Десятичное", "Двоичное"];
   int currTitle = 0;
   String result = "";
+
+  List<String> items = ['Двоичное', 'Десятичное', 'Восьмиричное', 'Шестнадцатиричное'];
+  String selectedItem = 'Двоичное';
 
   @override
   void initState() {
@@ -44,20 +47,52 @@ class _ConverterBinaryState extends State<ConverterBinary> {
   void updateResult(String s){
 
     setState(() {
+
       if (s.isNotEmpty && currTitle == 1) {
 
         if(!RegExp("[2-9]").hasMatch(s)){
-          result = int.parse(s, radix: 2).toString();
+          switch (selectedItem){
+            case "Двоичное":
+              result = controller.text;
+              break;
+            case "Десятичное":
+              result = int.parse(s, radix: 2).toString();;
+              break;
+            case "Восьмиричное":
+              result = int.parse(s, radix: 2).toRadixString(8).toString();
+              break;
+            case "Шестнадцатиричное":
+              result = int.parse(s, radix: 2).toRadixString(16).toString();
+              break;
+          }
+
         }else {
           result = "Вы ввели что то неверно...";
         }
 
       }if (s.isNotEmpty && currTitle == 0) {
-        int num = int.parse(s);
-        result = num.toRadixString(2);
+
+
+
+        switch (selectedItem){
+          case "Двоичное":
+            result = int.parse(s).toRadixString(2);
+            break;
+          case "Десятичное":
+            result = controller.text;
+            break;
+          case "Восьмиричное":
+            result = int.parse(s).toRadixString(8);
+            break;
+          case "Шестнадцатиричное":
+            result = int.parse(s).toRadixString(16);
+            break;
+        }
+
       }else if (s.isEmpty){
         result = "Здесь будет результат...";
       }
+
     });
   }
 
@@ -67,14 +102,11 @@ class _ConverterBinaryState extends State<ConverterBinary> {
     return Base.createBase(
         GestureDetector(
           onDoubleTap: (){
-            print("DOUBLE!!!");
             updateTitle();
             updateResult(controller.text);
           },
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity! > 0) {
-              // Смахивание вправо
-              print("Swipe right");
               Navigator.pop(context);
             }
           },
@@ -85,6 +117,22 @@ class _ConverterBinaryState extends State<ConverterBinary> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    DropdownButton(
+                      value: selectedItem,
+                      onChanged: (String? newValue) {
+
+                        setState(() {
+                          selectedItem = newValue!;
+                        });
+                        updateResult(controller.text);
+                      },
+                      items: items.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                     TextFormField(
                       controller: controller,
                       autofocus: true,
@@ -113,7 +161,7 @@ class _ConverterBinaryState extends State<ConverterBinary> {
               )
           ),
         ),
-        title: titles[currTitle]
+        title: "${titles[currTitle]} в $selectedItem"
     );
   }
 }

@@ -17,16 +17,17 @@ class ConverterViews extends StatefulWidget{
 class _ConverterViewsState extends State<ConverterViews> {
 
   final TextEditingController controller = TextEditingController();
-  List<String> titles = ["Просмотры в \$\$\$...", "\$\$\$ в просмотры..?"];
+  List<String> titles = ["Просмотры", "\$\$\$"];
   int currTitle = 0;
   String result = "";
+
+  List<String> items = ['Просмотры', '\$\$\$', '€€€', '¥¥¥'];
+  String selectedItem = '\$\$\$';
 
   @override
   void initState() {
     super.initState();
     controller.addListener(() {
-
-
       updateResult(controller.text);
     });
   }
@@ -50,12 +51,40 @@ class _ConverterViewsState extends State<ConverterViews> {
         result = "Здесь будет результат...";
       }else {
         if (currTitle == 1){
-          int num = ((int.parse(s) / 0.002).round());
-          result = "$num просмотров...";
+
+          switch (selectedItem){
+            case "Просмотры":
+              result = "${(int.parse(s) / 0.002).round()} просмотров...";
+              break;
+            case "\$\$\$":
+              result = "$s USD...";
+              break;
+            case '€€€':
+              result = "${(int.parse(s) * 0.93)} Евро...";
+              break;
+            case '¥¥¥':
+              result = "${(int.parse(s) * 7.15)} Юаней...";
+              break;
+          }
 
         }else {
-          double num = ((double.parse(s) * 0.002) * 1000).round() / 1000;
-          result = "$num USD...";
+          double usd = double.parse(s) * 0.002;
+          result = "$usd USD...";
+
+          switch (selectedItem){
+            case "Просмотры":
+              result = "$s просмотров...";
+              break;
+            case "\$\$\$":
+              result = "$usd USD...";
+              break;
+            case '€€€':
+              result = "${usd * 0.93} Евро...";
+              break;
+            case '¥¥¥':
+              result = "${usd * 7.15} Юаней...";
+              break;
+          }
         }
       }
     });
@@ -87,6 +116,22 @@ class _ConverterViewsState extends State<ConverterViews> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    DropdownButton(
+                      value: selectedItem,
+                      onChanged: (String? newValue) {
+
+                        setState(() {
+                          selectedItem = newValue!;
+                        });
+                        updateResult(controller.text);
+                      },
+                      items: items.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                     TextFormField(
                       controller: controller,
                       autofocus: true,
@@ -115,7 +160,7 @@ class _ConverterViewsState extends State<ConverterViews> {
               )
           ),
         ),
-        title: titles[currTitle]
+        title: "${titles[currTitle]} в $selectedItem"
     );
   }
 }

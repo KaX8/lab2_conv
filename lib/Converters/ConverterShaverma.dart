@@ -17,9 +17,12 @@ class ConverterShaverma extends StatefulWidget{
 class _ConverterShavermaState extends State<ConverterShaverma> {
 
   final TextEditingController controller = TextEditingController();
-  List<String> titles = ["Рубли в шаурму!!", "Шаурму в рубли!!!"];
+  List<String> titles = ["Рубли", "Шаурму"];
   int currTitle = 0;
   String result = "";
+
+  List<String> items = ['Рубли', 'Шаурму', 'Пиццу', 'Бургер'];
+  String selectedItem = 'Шаурму';
 
   @override
   void initState() {
@@ -50,12 +53,45 @@ class _ConverterShavermaState extends State<ConverterShaverma> {
         result = "Здесь будет результат...";
       }else {
         if (currTitle == 1){
-          int num = ((int.parse(s) * 162));
-          result = "это $num рублей...";
+          int num = ((int.parse(s) * 215));
+
+          switch (selectedItem){
+            case "Рубли":
+              result = "$num рублей...";
+              break;
+            case "Шаурму":
+              result = "это $s шаурмы...";
+              break;
+            case "Пиццу":
+              result = "это ${((num / 600) * 1000).round() / 1000} пицц...";
+              break;
+            case "Бургер":
+              result = "это ${((num / 250) * 1000).round() / 1000} бургеров...";
+              break;
+          }
         }else {
-          double num = (int.parse(s) / 162);
-          num = (num * 1000).round() / 1000;
-          result = "это $num шаурмы...";
+          // 162р это 1 шаурма   600р - 1 пицца  250 - 1 бургер
+
+          switch (selectedItem){
+            case "Рубли":
+              result = "$s рублей?...";
+              break;
+            case "Шаурму":
+              double num = (int.parse(s) / 215);
+              num = (num * 1000).round() / 1000;
+              result = "это $num шаурмы...";
+              break;
+            case "Пиццу":
+              double num = (int.parse(s) / 600);
+              num = (num * 1000).round() / 1000;
+              result = "это $num пицц...";
+              break;
+            case "Бургер":
+              double num = (int.parse(s) / 250);
+              num = (num * 1000).round() / 1000;
+              result = "это $num бургеров...";
+              break;
+          }
         }
       }
     });
@@ -87,6 +123,22 @@ class _ConverterShavermaState extends State<ConverterShaverma> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    DropdownButton(
+                      value: selectedItem,
+                      onChanged: (String? newValue) {
+
+                        setState(() {
+                          selectedItem = newValue!;
+                        });
+                        updateResult(controller.text);
+                      },
+                      items: items.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                     TextFormField(
                       controller: controller,
                       autofocus: true,
@@ -115,7 +167,7 @@ class _ConverterShavermaState extends State<ConverterShaverma> {
               )
           ),
         ),
-        title: titles[currTitle]
+        title: "${titles[currTitle]} в $selectedItem"
     );
   }
 }
